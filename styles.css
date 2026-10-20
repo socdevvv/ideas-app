@@ -352,6 +352,7 @@ h1 {
 }
 
 .hint { margin: 0; font-size: 12px; line-height: 1.45; color: var(--muted); }
+.hint a { color: var(--accent-soft); }
 .hint.small { font-size: 11px; }
 
 .sheet-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
