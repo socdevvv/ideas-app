@@ -208,7 +208,9 @@ async function putRemote(target, messages, sha) {
   };
   if (sha) body.sha = sha;
   const r = await api(target, "PUT", `contents/${FILE}`, body);
-  return r.conflict ? { conflict: true } : { ok: true };
+  if (r.conflict) return { conflict: true };
+  if (r.notFound) throw new Error("Нет доступа к репозиторию или файлу");
+  return { ok: true };
 }
 
 function hasPending() {
@@ -242,9 +244,10 @@ async function sync() {
         const merged = [...remote.messages, ...pending].sort((a, b) => Date.parse(a.ts) - Date.parse(b.ts));
         const res = await putRemote(cfg, merged, remote.sha);
         if (res.conflict) continue;
+        result = merged;
         try {
           const after = await fetchRemote(cfg);
-          result = after.messages;
+          if (after.sha) result = after.messages;
         } catch {
           result = merged;
         }
@@ -326,7 +329,9 @@ async function checkConnection() {
   els.sheetMsg.textContent = "Проверяю…";
   try {
     const r = await fetchRemote(test);
-    els.sheetMsg.textContent = `Связь есть. Сообщений в облаке: ${r.messages.length}`;
+    els.sheetMsg.textContent = r.sha
+      ? `Связь есть. Сообщений в облаке: ${r.messages.length}`
+      : "Файл не найден или нет доступа к репозиторию";
   } catch (e) {
     els.sheetMsg.textContent = e.message;
   }
