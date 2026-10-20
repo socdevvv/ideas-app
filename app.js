@@ -171,6 +171,7 @@ function b64decode(text) {
 async function api(target, method, path, body) {
   const res = await fetch(`${API}/repos/${target.repo}/${path}`, {
     method,
+    cache: "no-store",
     headers: {
       Authorization: `Bearer ${target.token}`,
       Accept: "application/vnd.github+json",
@@ -245,7 +246,10 @@ async function sync() {
       if (pending.length || !remote.sha) {
         const merged = [...remote.messages, ...pending].sort((a, b) => Date.parse(a.ts) - Date.parse(b.ts));
         const res = await putRemote(cfg, merged, remote.sha);
-        if (res.conflict) continue;
+        if (res.conflict) {
+          await new Promise((resolve) => setTimeout(resolve, 700 * (attempt + 1)));
+          continue;
+        }
         result = merged;
         try {
           const after = await fetchRemote(cfg);
