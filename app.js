@@ -23,7 +23,9 @@ const els = {
   sheetMsg: $("#sheetMsg"),
   toast: $("#toast"),
   install: $("#install"),
+  installText: $("#installText"),
   btnInstall: $("#btnInstall"),
+  btnInstallClose: $("#btnInstallClose"),
 };
 
 let cfg = loadCfg();
@@ -381,10 +383,40 @@ document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible" && cfg.token) sync();
 });
 
+function isStandalone() {
+  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
+
+function showInstallHint() {
+  if (isStandalone() || localStorage.getItem("ideas.installDismissed") === "1") return;
+  const ua = navigator.userAgent;
+  const inApp = /\bwv\b\)/.test(ua) || /Telegram|Instagram|FBAN|FBAV/i.test(ua);
+  const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const isAndroid = /Android/i.test(ua);
+  els.install.classList.remove("hidden");
+  els.btnInstall.classList.toggle("hidden", !deferredPrompt);
+  if (deferredPrompt) {
+    els.installText.textContent = "Установить приложение на телефон?";
+  } else if (inApp) {
+    els.installText.textContent = "Открой ссылку в браузере (меню → «Открыть в браузере»), затем установи приложение.";
+  } else if (isIOS) {
+    els.installText.textContent = "Установка на iPhone: «Поделиться» → «На экран „Домой“».";
+  } else if (isAndroid) {
+    els.installText.textContent = "Установка: меню Chrome (⋮) → «Установить приложение» (или «Добавить на главный экран»).";
+  } else {
+    els.installText.textContent = "Установка: значок установки в адресной строке Chrome.";
+  }
+}
+
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  els.install.classList.remove("hidden");
+  showInstallHint();
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredPrompt = null;
+  els.install.classList.add("hidden");
 });
 
 els.btnInstall.addEventListener("click", async () => {
@@ -394,6 +426,13 @@ els.btnInstall.addEventListener("click", async () => {
   deferredPrompt = null;
   els.install.classList.add("hidden");
 });
+
+els.btnInstallClose.addEventListener("click", () => {
+  els.install.classList.add("hidden");
+  localStorage.setItem("ideas.installDismissed", "1");
+});
+
+setTimeout(showInstallHint, 1200);
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {

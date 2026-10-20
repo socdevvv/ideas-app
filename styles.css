@@ -221,17 +221,45 @@ h1 {
 .empty h2 { margin: 0; font-size: 16px; color: var(--text); font-weight: 600; }
 .empty p { margin: 0; font-size: 13.5px; line-height: 1.5; }
 
-.install { padding: 0 14px 8px; display: flex; justify-content: center; }
+.install {
+  margin: 0 14px 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.install-text {
+  flex: 1;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--muted);
+}
 
 #btnInstall {
+  flex: none;
   border: 0;
   border-radius: 999px;
-  padding: 9px 16px;
+  padding: 8px 14px;
   background: var(--accent-soft);
   color: #1d0f07;
   font: inherit;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
+  cursor: pointer;
+}
+
+.install-close {
+  flex: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 4px;
   cursor: pointer;
 }
 
