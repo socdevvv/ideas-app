@@ -1,6 +1,6 @@
 # Идеи — агенту
 
-**Приложение: https://arctikasdiary-creator.github.io/ideas-app/**
+**Приложение: https://socdevvv.github.io/ideas-app/**
 
 Мобильное PWA-приложение: асинхронный чат с агентом. Идеи можно отправлять, даже когда компьютер выключен.
 

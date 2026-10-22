@@ -1,6 +1,7 @@
 const CFG_KEY = "ideas.cfg.v1";
 const MSG_KEY = "ideas.msgs.v1";
-const DEFAULT_CFG = { repo: "arctikasdiary-creator/ideas", branch: "main", token: "" };
+const DEFAULT_CFG = { repo: "socdevvv/ideas", branch: "main", token: "" };
+const LEGACY_REPO = "arctikasdiary-creator/ideas";
 const FILE = "ideas.json";
 const API = "https://api.github.com";
 
@@ -36,7 +37,12 @@ let deferredPrompt = null;
 
 function loadCfg() {
   try {
-    return { ...DEFAULT_CFG, ...JSON.parse(localStorage.getItem(CFG_KEY) || "{}") };
+    const stored = JSON.parse(localStorage.getItem(CFG_KEY) || "{}");
+    if (stored.repo === LEGACY_REPO) {
+      stored.repo = DEFAULT_CFG.repo;
+      localStorage.setItem(CFG_KEY, JSON.stringify({ ...DEFAULT_CFG, ...stored }));
+    }
+    return { ...DEFAULT_CFG, ...stored };
   } catch {
     return { ...DEFAULT_CFG };
   }
